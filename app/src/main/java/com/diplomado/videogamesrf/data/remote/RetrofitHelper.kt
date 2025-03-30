@@ -6,22 +6,34 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-//Instancia a retrofit.
-
+/**
+ * Clase auxiliar para configurar y proporcionar una instancia de Retrofit.
+ * Se utiliza para realizar peticiones HTTP a la API remota.
+ */
 class RetrofitHelper {
 
-    val interceptor = HttpLoggingInterceptor().apply {
-        level =
-            HttpLoggingInterceptor.Level.BODY //respuesta al nivel del body en la operación de red
+    // Interceptor para registrar el detalle de las peticiones y respuestas HTTP (ideal para debugging)
+    private val interceptor = HttpLoggingInterceptor().apply {
+        // Nivel BODY muestra encabezados, cuerpo de solicitud/respuesta y metadatos (solo usar en desarrollo)
+        level = HttpLoggingInterceptor.Level.BODY
     }
 
-    val client = OkHttpClient.Builder().apply {
-        addInterceptor(interceptor)
-    }.build()
-
-    fun getRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
+    // Cliente HTTP personalizado con el interceptor añadido
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(interceptor)
         .build()
+
+    /**
+     * Crea y retorna una instancia de Retrofit ya configurada con:
+     * - Base URL (definida en Constants)
+     * - Cliente HTTP con interceptor
+     * - Conversor Gson para parsear JSON
+     */
+    fun getRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 }
